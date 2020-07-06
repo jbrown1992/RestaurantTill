@@ -12,9 +12,6 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "When I add a Starter" +
-            "Then order size is 1")]
         public void AddStarterToList()
         {
             OrderList orderList = new OrderList();
@@ -23,10 +20,6 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add a Starter" +
-            "When I delete a Starter" +
-            "Then order size is 0")]
         public void DeleteStarterFromList()
         {
             OrderList orderList = new OrderList();
@@ -36,9 +29,6 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "When I add a Main" +
-            "Then order size is 1")]
         public void AddMainToList()
         {
             OrderList orderList = new OrderList();
@@ -47,10 +37,6 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add a Main" +
-            "When I delete a Main" +
-            "Then order size is 0")]
         public void DeleteMainFromList()
         {
             OrderList orderList = new OrderList();
@@ -59,11 +45,44 @@ namespace RestaurantTill
             Assert.AreEqual(0, orderList.GetCountOfItems());
         }
 
+        [Test]
+        public void UpdateStarter()
+        {
+            OrderList orderList = new OrderList();
+            orderList.AddStarter(StarterMenu.Chips);
+            orderList.UpdateStarter(StarterMenu.Chips, StarterMenu.HotWings);
+            Assert.AreEqual(1, orderList.GetCountOfItems());
+            Assert.AreEqual(StarterMenu.HotWings, orderList.GetList()[0].Meal);
+        }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "When I delete a Starter" +
-            "Then order size is 0")]
+        public void UpdateMain()
+        {
+            OrderList orderList = new OrderList();
+            orderList.AddMain(MainMenu.CheeseBurger);
+            orderList.UpdateMain(MainMenu.CheeseBurger, MainMenu.SteakChips);
+            Assert.AreEqual(1, orderList.GetCountOfItems());
+            Assert.AreEqual(MainMenu.SteakChips, orderList.GetList()[0].Meal);
+        }
+
+        [Test]
+        public void StarterPriceIsReturned()
+        {
+            OrderList orderList = new OrderList();
+            orderList.AddStarter(StarterMenu.Chips);
+            Assert.AreEqual(4.40, orderList.GetList()[0].Price);
+        }
+
+        [Test]
+        public void MainPriceIsReturned()
+        {
+            OrderList orderList = new OrderList();
+            orderList.AddMain(MainMenu.CheeseBurger);
+            Assert.AreEqual(7.00, orderList.GetList()[0].Price);
+        }
+
+
+        [Test]
         public void AttemptToDeleteStarterInEmptyList()
         {
             OrderList orderList = new OrderList();
@@ -71,11 +90,7 @@ namespace RestaurantTill
             Assert.AreEqual(0, orderList.GetCountOfItems());
         }
 
-
         [Test]
-        [Description("Given I have an Order List" +
-            "When I delete a Main" +
-            "Then order size is 0")]
         public void AttemptToDeleteMainInEmptyList()
         {
             OrderList orderList = new OrderList();
@@ -84,10 +99,6 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "When I add 2 Starters" +
-            "And I add 3 Mains" +
-            "Then order size is 5")]
         public void AddMultipleFoodItemsToList()
         {
             OrderList orderList = new OrderList();
@@ -99,14 +110,7 @@ namespace RestaurantTill
             Assert.AreEqual(5, orderList.GetCountOfItems());
         }
 
-
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add 2 Starters" +
-            "And I add 4 Mains" +
-            "When I delete 1 Starter" +
-            "And I delete 2 Mains" +
-            "Then order size is 3")]
         public void DeletingMultipleFoodItemsFromList()
         {
             OrderList orderList = new OrderList();
@@ -124,9 +128,19 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "When I get Total Cost" +
-            "Then Total Cost is £0.00")]
+        [TestCase(0.00, "£0.00")]
+        [TestCase(0.01, "£0.01")]
+        [TestCase(1.00, "£1.00")]
+        [TestCase(10.99, "£10.99")]
+        [TestCase(1234567.89, "£1,234,567.89")]
+        public void DecimalConvertedToPounds(decimal total, string poundValue)
+        {
+            Till till = new Till(new OrderList());
+            Assert.AreEqual(poundValue, till.convertToPounds(total));
+
+        }
+
+        [Test]
         public void GetTotalOfEmptyList()
         {
             OrderList orderList = new OrderList();
@@ -136,10 +150,6 @@ namespace RestaurantTill
 
 
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add 1 Starter" +
-            "When I get Total Cost" +
-            "Then Total Cost is £4.40")]
         public void GetTotalOfOneStarter()
         {
             OrderList orderList = new OrderList();
@@ -149,10 +159,6 @@ namespace RestaurantTill
         }
 
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add 1 Main" +
-            "When I get Total Cost" +
-            "Then Total Cost is £7.00")]
         public void GetTotalOfOneMain()
         {
             OrderList orderList = new OrderList();
@@ -174,46 +180,46 @@ namespace RestaurantTill
             Assert.AreEqual("£7.00", till.GetTotalFromList());
         }
 
-
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add 8 Starters" +
-            "And I add 11 Mains" +
-            "When I get Total Cost" +
-            "Then Total Cost is £112.20")]
-        public void GetTotalOfMultipleFoodItems()
+        [TestCase(2, 2, "£22.80")]
+        [TestCase(2, 0, "£8.80")]
+        [TestCase(0, 2, "£14.00")]
+        [TestCase(5, 11, "£99.00")]
+        [TestCase(11, 5, "£83.40")]
+        [TestCase(15, 15, "£171.00")]
+        public void GetTotalOfMultipleFoodItems(int numOfStarters, int numOfMains, string expectedCost)
         {
             OrderList orderList = new OrderList();
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < numOfStarters; i++)
             {
                 orderList.AddStarter(StarterMenu.Chips);
             }
 
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < numOfMains; i++)
             {
                 orderList.AddMain(MainMenu.CheeseBurger);
             }
 
             Till till = new Till(orderList);
-            Assert.AreEqual("£112.20", till.GetTotalFromList());
+            Assert.AreEqual(expectedCost, till.GetTotalFromList());
         }
 
-
         [Test]
-        [Description("Given I have an Order List" +
-            "And I add 8 Starters" +
-            "And I add 11 Mains" +
-            "When I get Total Cost" +
-            "Then Total Cost is £112.20")]
-        public void GetTotalOfMultipleFoodItemsAfterMultipleDeletes()
+        [TestCase(3, 3, "£18.40")]
+        [TestCase(3, 0, "£4.40")]
+        [TestCase(0, 2, "£7.00")]
+        [TestCase(5, 11, "£83.20")]
+        [TestCase(11, 5, "£67.60")]
+        [TestCase(15, 15, "£155.20")]
+        public void GetTotalOfMultipleFoodItemsAfterMultipleDeletes(int numOfStarters, int numOfMains, string expectedCost)
         {
             OrderList orderList = new OrderList();
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < numOfStarters; i++)
             {
                 orderList.AddStarter(StarterMenu.Chips);
             }
 
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < numOfMains; i++)
             {
                 orderList.AddMain(MainMenu.CheeseBurger);
             }
@@ -223,7 +229,7 @@ namespace RestaurantTill
             orderList.DeleteStarter(StarterMenu.Chips);
             orderList.DeleteMain(MainMenu.CheeseBurger);
 
-            Assert.AreEqual("£96.40", till.GetTotalFromList());
+            Assert.AreEqual(expectedCost, till.GetTotalFromList());
         }
     }
 }

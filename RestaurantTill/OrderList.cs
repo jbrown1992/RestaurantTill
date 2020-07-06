@@ -15,11 +15,6 @@ namespace RestaurantTill
             orderList = new List<FoodItem>();
         }
 
-        public void AddItemToList(FoodItem foodItem)
-        {
-            orderList.Add(foodItem);
-        }
-
         public void AddStarter(string name)
         {
             orderList.Add(new Starter(name));
@@ -50,6 +45,16 @@ namespace RestaurantTill
         {
                 var mainToRemove = orderList.FirstOrDefault(item => item is Main && item.Meal == name);
                 orderList.Remove(mainToRemove);
+        }
+
+        public void UpdateStarter(string name, string newName)
+        {
+            orderList.FirstOrDefault(item => item is Starter && item.Meal == name).Meal = newName;
+        }
+
+        public void UpdateMain(string name, string newName)
+        {
+            orderList.FirstOrDefault(item => item is Main && item.Meal == name).Meal = newName;
         }
     }
 }
