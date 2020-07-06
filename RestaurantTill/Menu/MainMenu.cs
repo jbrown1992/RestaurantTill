@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RestaurantTill.Menu
 {
-    class MainMenu
+    public class MainMenu
     {
         public const string SteakChips = "Steak and Chips";
         public const string CheeseBurger = "Cheese Burger";
